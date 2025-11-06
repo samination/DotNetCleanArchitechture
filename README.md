@@ -1,3 +1,5 @@
+> **Note:** This project is a personal learning fork of the original Dotnet CRUD API created by [Christian Schou](https://github.com/Christian-Schou). All credit for the original implementation belongs to him.
+
 <h1 align="center">
   <br>
   <a href="https://christian-schou.dk"><img src="https://github.com/Tech-With-Christian/Dotnet-Demo-CRUD-Api/blob/main/assets/img/cs-logo-polygon.png" alt="Christian Schou Logo" width="200"></a>
@@ -7,6 +9,8 @@
 </h1>
 
 <h4 align="center">This is a simple CRUD API for use in my <a href="https://blog.christian-schou.dk" target="_blank">tutorials</a>. It contains a simple implementation of a CRUD service for products, that can easily be extended.</h4>
+
+<p align="center"><em>This repository is a fork of the original <a href="https://github.com/Tech-With-Christian/Dotnet-CRUD-Api">Dotnet CRUD API</a> by <a href="https://github.com/Christian-Schou">Christian Schou</a>.</em></p>
 
 
 <p align="center">
