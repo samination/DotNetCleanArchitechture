@@ -28,7 +28,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add mediator and mapper
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add Endpoint explorer and Swagger

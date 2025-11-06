@@ -1,5 +1,7 @@
-﻿using Application.Services.Categories;
-using CrudApi.Application.UnitTests.Mocks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Application.Common.Models;
+using Application.Services.Categories;
 using Domain.Entitites.Categories;
 using Moq;
 
@@ -32,14 +34,26 @@ namespace CrudApi.Application.UnitTests.Mocks
             var mockCategoryService = new Mock<ICategoryService>();
 
             // Setup method to test Get Categories (The get all service)
-            mockCategoryService.Setup(s => s.GetCategoriesAsync(CancellationToken.None)).ReturnsAsync(categories);
+            mockCategoryService
+                .Setup(s => s.GetCategoriesAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((int pageNumber, int pageSize, CancellationToken _) =>
+                {
+                    var pagedItems = categories
+                        .Skip((pageNumber - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList();
+
+                    return new PaginatedResult<Category>(pagedItems, categories.Count, pageNumber, pageSize);
+                });
 
             // Configuration of what happens when we call the Create new Category method
-            mockCategoryService.Setup(s => s.CreateCategoryAsync(It.IsAny<Category>(), CancellationToken.None)).ReturnsAsync((Category category, CancellationToken ct) =>
-            {
-                categories.Add(category);
-                return category;
-            });
+            mockCategoryService
+                .Setup(s => s.CreateCategoryAsync(It.IsAny<Category>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Category category, CancellationToken _) =>
+                {
+                    categories.Add(category);
+                    return category;
+                });
 
             // Return the mocked service for categories
             return mockCategoryService;

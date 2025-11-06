@@ -1,11 +1,11 @@
 ﻿using API.Mappings.Categories;
+using Application.Common.Models;
 using Application.Features.Categories.Handlers.Read;
 using Application.Features.Categories.Queries;
 using Application.Services.Categories;
 using AutoMapper;
 using CrudApi.Application.UnitTests.Mocks;
 using Domain.Entitites.Categories;
-using Moq;
 using Shouldly;
 
 namespace CrudApi.Application.UnitTests.Categories.Queries
@@ -24,11 +24,12 @@ namespace CrudApi.Application.UnitTests.Categories.Queries
         {
             var handler = new GetAllCategoriesHandler(_mockCategoryService.Object);
 
-            var result = await handler.Handle(new GetAllCategoriesQuery(), CancellationToken.None);
+            var result = await handler.Handle(new GetAllCategoriesQuery(1, 10), CancellationToken.None);
 
-            result.ShouldBeOfType<List<Category>>();
+            result.ShouldBeOfType<PaginatedResult<Category>>();
 
-            result.Count.ShouldBe(2);
+            result.TotalCount.ShouldBe(2);
+            result.Items.Count.ShouldBe(2);
         }
     }
 }

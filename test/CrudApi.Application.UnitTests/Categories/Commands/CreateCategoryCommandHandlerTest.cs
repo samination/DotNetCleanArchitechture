@@ -28,7 +28,7 @@ namespace CrudApi.Application.UnitTests.Categories.Commands
 
             // Set up MediatR with the handler
             var services = new ServiceCollection();
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddCategoryHandler).Assembly));
+            services.AddMediatR(typeof(AddCategoryHandler).Assembly);
             services.AddSingleton(_mockService.Object);
             
             var serviceProvider = services.BuildServiceProvider();
@@ -42,13 +42,14 @@ namespace CrudApi.Application.UnitTests.Categories.Commands
             var result = await _mediator.Send(new AddCategoryCommand(_category), CancellationToken.None);
 
             // Get all categories from the mocked service
-            var categories = await _mockService.Object.GetCategoriesAsync(CancellationToken.None);
+            var categories = await _mockService.Object.GetCategoriesAsync(1, 10, CancellationToken.None);
 
             // Make sure that the result we got in return from the command handler is of type Category
             result.ShouldBeOfType<Category>();
 
             // Make sure that we now have 3 categories as we started with 2 categories in the mock service
-            categories.Count.ShouldBe(3);
+            categories.TotalCount.ShouldBe(3);
+            categories.Items.Count.ShouldBe(3);
         }
     }
 }
