@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Features.Categories.Handlers.Delete
 {
-    public class DeleteCategoryHandler : IRequestHandler<DeleteCategoryByIdCommand>
+    public class DeleteCategoryHandler : IRequestHandler<DeleteCategoryByIdCommand, Unit>
     {
         private readonly ICategoryService _categories;
 
@@ -13,9 +13,10 @@ namespace Application.Features.Categories.Handlers.Delete
             _categories = categories;
         }
 
-        public async Task Handle(DeleteCategoryByIdCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DeleteCategoryByIdCommand request, CancellationToken cancellationToken)
         {
             await _categories.DeleteCategoryAsync(request.id, cancellationToken);
+            return Unit.Value;
         }
     }
 }

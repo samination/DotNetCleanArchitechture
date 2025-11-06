@@ -1,4 +1,5 @@
-﻿using Application.Services.Common;
+﻿using Application.Common.Models;
+using Application.Services.Common;
 using Domain.Entitites.Categories;
 
 namespace Application.Services.Categories
@@ -25,8 +26,8 @@ namespace Application.Services.Categories
         /// Get all categories in the database (if any).<br />
         /// If no categories exist in the database, an exception will be thrown and a status code of 404 will be returned.
         /// </summary>
-        /// <returns>A list of categories to enumerate</returns>
-        Task<List<Category>> GetCategoriesAsync(CancellationToken ct);
+        /// <returns>A paginated list of categories</returns>
+        Task<PaginatedResult<Category>> GetCategoriesAsync(int pageNumber, int pageSize, CancellationToken ct);
 
         /// <summary>
         /// Add a new category to the database.<br />

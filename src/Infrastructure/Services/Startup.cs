@@ -68,7 +68,7 @@ namespace Infrastructure.Services
             {
                 if (scopedServiceType.IsAssignableFrom(scopedService.Service))
                 {
-                    services.AddTransient(scopedService.Service, scopedService.Implementation);
+                    services.AddScoped(scopedService.Service, scopedService.Implementation);
                 }
             }
 
@@ -98,7 +98,7 @@ namespace Infrastructure.Services
             {
                 if (singletonServiceType.IsAssignableFrom(singletonService.Service))
                 {
-                    services.AddScoped(singletonService.Service, singletonService.Implementation);
+                    services.AddSingleton(singletonService.Service, singletonService.Implementation);
                 }
             }
 

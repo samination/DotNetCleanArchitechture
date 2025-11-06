@@ -1,4 +1,5 @@
-﻿using Application.Services.Categories;
+﻿using Application.Common.Models;
+using Application.Services.Categories;
 using Data.Database;
 using Domain.Entitites.Categories;
 using Domain.Helpers.Exceptions;
@@ -45,21 +46,38 @@ namespace Infrastructure.Services.Categories
         #region Read (R)
 
         /// <summary>
-        /// Async method that enumerates the Categories asynchronously and returns them as an IEnumerable.
+        /// Async method that enumerates the Categories asynchronously and returns them as a paginated list.
         /// </summary>
-        /// <returns>List of categories from database</returns>
-        public async Task<List<Category>> GetCategoriesAsync(CancellationToken ct)
+        /// <returns>Paginated categories from database</returns>
+        public async Task<PaginatedResult<Category>> GetCategoriesAsync(int pageNumber, int pageSize, CancellationToken ct)
         {
-            List<Category> categories = await _db.Categories
-                .AsNoTracking()
-                .ToListAsync(cancellationToken: ct);
+            if (pageNumber < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than or equal to 1.");
+            }
 
-            if (categories.Count() == 0)
+            if (pageSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than or equal to 1.");
+            }
+
+            IQueryable<Category> query = _db.Categories
+                .AsNoTracking()
+                .OrderBy(x => x.Name);
+
+            int totalCount = await query.CountAsync(cancellationToken: ct);
+
+            if (totalCount == 0)
             {
                 throw new KeyNotFoundException("There are no categories in the database. Please add a category and try again.");
             }
 
-            return categories;
+            List<Category> categories = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken: ct);
+
+            return new PaginatedResult<Category>(categories, totalCount, pageNumber, pageSize);
         }
 
         /// <summary>

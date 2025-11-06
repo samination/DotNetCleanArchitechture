@@ -1,9 +1,10 @@
 using API.Configurations;
+using Data.Database;
 using Infrastructure;
 using Infrastructure.Common;
+using MediatR;
 using Serilog;
 using System.Text.Json.Serialization;
-using MediatR;
 
 StaticLogger.EnsureLoggerIsInitialized();
 Log.Information("Starting Web API...");
@@ -27,7 +28,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add mediator and mapper
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add Endpoint explorer and Swagger
@@ -36,6 +37,9 @@ builder.Services.AddSwaggerGen();
 
 // Build the application
 var app = builder.Build();
+
+// Seed database fixtures
+await app.Services.SeedDatabaseAsync();
 
 // Configure the HTTP request pipeline.
 // Use Swagger and it's UI
@@ -56,4 +60,4 @@ app.MapControllers();
 
 // All done - let's run the app / API
 Log.Information("The Web API is now ready to accept incoming requests!");
-app.Run();
+await app.RunAsync();

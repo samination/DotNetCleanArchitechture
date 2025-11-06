@@ -3,6 +3,8 @@ using Application.Features.Categories.Queries;
 using AutoMapper;
 using Domain.Entitites.Categories;
 using DTO.Categories;
+using DTO.Common;
+using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,17 +24,24 @@ namespace API.Controllers.Categories
         }
 
         [HttpGet("get")]
-        public async Task<IActionResult> GetAllCategories(CancellationToken ct)
+        public async Task<IActionResult> GetAllCategories([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         { 
-            var categories = await _mediator.Send(new GetAllCategoriesQuery(), ct);
-            return Ok(categories);
+            var categories = await _mediator.Send(new GetAllCategoriesQuery(pageNumber, pageSize), ct);
+            var categoryDtos = _mapper.Map<PaginatedResponseDto<CategoryResponseDto>>(categories);
+            return Ok(categoryDtos);
         }
 
         [HttpGet("get/{id}")]
         public async Task<IActionResult> GetCategoryById(Guid id, CancellationToken ct)
         { 
             var category = await _mediator.Send(new GetCategoryByIdQuery(id), ct);
-            return Ok(category);
+            if (category is null)
+            {
+                return NotFound();
+            }
+
+            var categoryDto = _mapper.Map<CategoryResponseDto>(category);
+            return Ok(categoryDto);
         }
 
         [HttpPost("add")]

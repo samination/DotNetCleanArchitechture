@@ -1,11 +1,12 @@
-﻿using Application.Features.Categories.Queries;
+﻿using Application.Common.Models;
+using Application.Features.Categories.Queries;
 using Application.Services.Categories;
 using Domain.Entitites.Categories;
 using MediatR;
 
 namespace Application.Features.Categories.Handlers.Read
 {
-    public class GetAllCategoriesHandler : IRequestHandler<GetAllCategoriesQuery, List<Category>>
+    public class GetAllCategoriesHandler : IRequestHandler<GetAllCategoriesQuery, PaginatedResult<Category>>
     {
         private readonly ICategoryService _categories;
 
@@ -14,9 +15,9 @@ namespace Application.Features.Categories.Handlers.Read
             _categories = categories;
         }
 
-        public async Task<List<Category>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedResult<Category>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
         {
-            return await _categories.GetCategoriesAsync(cancellationToken);
+            return await _categories.GetCategoriesAsync(request.PageNumber, request.PageSize, cancellationToken);
         }
     }
 }

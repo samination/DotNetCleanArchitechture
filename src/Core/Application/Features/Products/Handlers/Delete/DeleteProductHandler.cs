@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Features.Products.Handlers.Delete
 {
-    public class DeleteProductHandler : IRequestHandler<DeleteProductCommand>
+    public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, Unit>
     {
         private readonly IProductService _products;
 
@@ -13,9 +13,10 @@ namespace Application.Features.Products.Handlers.Delete
             _products = products;
         }
 
-        public async Task Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
             await _products.DeleteProductAsync(request.productId, cancellationToken);
+            return Unit.Value;
         }
     }
 }

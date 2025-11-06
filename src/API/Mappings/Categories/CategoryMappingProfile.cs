@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using Application.Common.Models;
+using AutoMapper;
 using Domain.Entitites.Categories;
 using DTO.Categories;
+using DTO.Common;
 
 namespace API.Mappings.Categories
 {
@@ -28,6 +30,9 @@ namespace API.Mappings.Categories
 
                         return true;
                     }));
+
+            CreateMap<PaginatedResult<Category>, PaginatedResponseDto<CategoryResponseDto>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
 
             #endregion Read
 
