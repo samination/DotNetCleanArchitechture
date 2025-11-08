@@ -179,6 +179,34 @@ namespace Infrastructure.Services.Products
 
         #endregion Delete (D)
 
+        #region Stock
+
+        public async Task DecrementStockAsync(Guid productId, int quantity, CancellationToken ct)
+        {
+            if (quantity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity to decrement must be greater than zero.");
+            }
+
+            Product? product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productId, ct);
+
+            if (product is null)
+            {
+                throw new KeyNotFoundException($"The product with ID: {productId} was not found in the database.");
+            }
+
+            if (product.Stock < quantity)
+            {
+                throw new CustomException($"Insufficient stock for product '{product.Name}'. Current stock: {product.Stock}, requested decrement: {quantity}.");
+            }
+
+            product.Stock -= quantity;
+
+            await _db.SaveChangesAsync(ct);
+        }
+
+        #endregion Stock
+
         #region Helpers
 
         /// <summary>

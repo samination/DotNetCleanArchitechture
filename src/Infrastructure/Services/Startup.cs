@@ -1,4 +1,6 @@
-﻿using Application.Services.Common;
+﻿using System;
+using System.Linq;
+using Application.Services.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -53,11 +55,23 @@ namespace Infrastructure.Services
                 .SelectMany(s => s.GetTypes())
                 .Where(scopedServiceType.IsAssignableFrom)
                 .Where(p => p.IsClass && !p.IsAbstract)
-                .Select(p => new
+                .Select(p =>
                 {
-                    Service = p.GetInterfaces().FirstOrDefault(),
-                    Implementation = p
-                });
+                    var serviceInterface = p.GetInterfaces()
+                        .Where(i => i != scopedServiceType && scopedServiceType.IsAssignableFrom(i))
+                        .SelectMany(i => i.GetInterfaces().Prepend(i))
+                        .FirstOrDefault(i => !scopedServiceType.IsAssignableFrom(i));
+
+                    serviceInterface ??= p.GetInterfaces()
+                        .FirstOrDefault(i => i != scopedServiceType);
+
+                    return new
+                    {
+                        Service = serviceInterface,
+                        Implementation = p
+                    };
+                })
+                .Where(x => x.Service is not null);
 
             // Register each scoped service for startup
             if (scopedServices.Count() > 0)
@@ -66,10 +80,7 @@ namespace Infrastructure.Services
             }
             foreach (var scopedService in scopedServices)
             {
-                if (scopedServiceType.IsAssignableFrom(scopedService.Service))
-                {
-                    services.AddScoped(scopedService.Service, scopedService.Implementation);
-                }
+                services.AddScoped(scopedService.Service, scopedService.Implementation);
             }
 
             #endregion Scoped Services

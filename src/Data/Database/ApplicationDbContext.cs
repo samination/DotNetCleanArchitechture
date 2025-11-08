@@ -1,27 +1,41 @@
-﻿using Domain.Entitites.Categories;
+﻿using Data.Identity;
+using Domain.Entitites.Categories;
+using Domain.Entitites.Orders;
 using Domain.Entitites.Products;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Serilog;
 
 namespace Data.Database
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
-        private readonly IConfiguration _configuration;
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IConfiguration configuration)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         { 
-            _configuration = configuration;
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseInMemoryDatabase("CrudApiDb");
         }
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Order> Orders { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Order>(entity =>
+            {
+                entity.HasOne(o => o.Product)
+                    .WithMany()
+                    .HasForeignKey(o => o.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(o => o.PaymentStatus)
+                    .HasConversion<int>();
+
+                entity.Property(o => o.CreatedAt)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            });
+        }
     }
 }

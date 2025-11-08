@@ -1,4 +1,6 @@
 ﻿using Data;
+using Infrastructure.Identity;
+using Infrastructure.Messaging.Kafka;
 using Infrastructure.Middleware;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +16,9 @@ namespace Infrastructure
         {
             Log.Information("Adding Infrastructure services");
             services.AddServices();
-            services.AddDatabase();
+            services.AddDatabase(configuration);
+            services.AddIdentityInfrastructure(configuration);
+            services.AddKafkaInfrastructure(configuration);
             return services;
         }
 
