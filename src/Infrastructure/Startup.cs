@@ -1,4 +1,5 @@
 ﻿using Data;
+using Infrastructure.Identity;
 using Infrastructure.Middleware;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +15,8 @@ namespace Infrastructure
         {
             Log.Information("Adding Infrastructure services");
             services.AddServices();
-            services.AddDatabase();
+            services.AddDatabase(configuration);
+            services.AddIdentityInfrastructure(configuration);
             return services;
         }
 

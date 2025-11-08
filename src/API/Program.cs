@@ -52,11 +52,15 @@ app.UseInfrastructure(builder.Configuration);
 // Enable HTTPS Redirection
 app.UseHttpsRedirection();
 
+// Enable authentication
+app.UseAuthentication();
+
 // Enable authorization capabilities
 app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();
+
 
 // All done - let's run the app / API
 Log.Information("The Web API is now ready to accept incoming requests!");
