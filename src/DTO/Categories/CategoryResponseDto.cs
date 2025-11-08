@@ -3,7 +3,7 @@
     public record CategoryResponseDto
     (
         Guid Id,
-        string Name ,
+        string Name,
         string Description
     );
 }

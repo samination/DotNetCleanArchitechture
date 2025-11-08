@@ -144,7 +144,7 @@ namespace Infrastructure.Services.Categories
         {
             // Make sure no products are connected to the category
             if (await _db.Products.AnyAsync(x => x.CategoryId == id))
-            { 
+            {
                 throw new CustomException("There are products connected to this category. Please remove the products from the category and try again.");
             }
 

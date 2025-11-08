@@ -15,7 +15,7 @@ namespace Infrastructure.Services
         /// <returns>Service collection with registered services with their respective lifetime in the service container</returns>
         internal static IServiceCollection AddServices(this IServiceCollection services)
         {
-            
+
             #region Transient Services
 
             var transientServiceType = typeof(ITransientService);

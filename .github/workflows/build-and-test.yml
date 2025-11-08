@@ -1,3 +1,37 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore CrudApi.sln
+
+      - name: Check code formatting
+        run: dotnet format CrudApi.sln --verify-no-changes
+
+      - name: Build
+        run: dotnet build CrudApi.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test CrudApi.sln --configuration Release --no-build --no-restore
 name: build-and-test
 
 on:

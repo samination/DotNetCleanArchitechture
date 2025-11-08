@@ -27,7 +27,7 @@ namespace API.Controllers.Categories
 
         [HttpGet("get")]
         public async Task<IActionResult> GetAllCategories([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
-        { 
+        {
             var categories = await _mediator.Send(new GetAllCategoriesQuery(pageNumber, pageSize), ct);
             var categoryDtos = _mapper.Map<PaginatedResponseDto<CategoryResponseDto>>(categories);
             return Ok(categoryDtos);
@@ -35,7 +35,7 @@ namespace API.Controllers.Categories
 
         [HttpGet("get/{id}")]
         public async Task<IActionResult> GetCategoryById(Guid id, CancellationToken ct)
-        { 
+        {
             var category = await _mediator.Send(new GetCategoryByIdQuery(id), ct);
             if (category is null)
             {
@@ -48,7 +48,7 @@ namespace API.Controllers.Categories
 
         [HttpPost("add")]
         public async Task<IActionResult> AddCategory([FromBody] CategoryAddRequestDto categoryToAdd, CancellationToken ct)
-        { 
+        {
             // Map the DTO to a domain model
             Category mappedCategoryToAdd = _mapper.Map<Category>(categoryToAdd);
 
@@ -80,7 +80,7 @@ namespace API.Controllers.Categories
 
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCategory(Guid id, CancellationToken ct)
-        { 
+        {
             // Delete the category from the application database
             await _mediator.Send(new DeleteCategoryByIdCommand(id), ct);
 

@@ -57,7 +57,8 @@ namespace Infrastructure.Middleware
                         break;
                 }
 
-                var result = JsonSerializer.Serialize(new {
+                var result = JsonSerializer.Serialize(new
+                {
                     id = id.ToString(),
                     message = error?.Message,
                     statusCode = response.StatusCode,
