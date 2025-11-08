@@ -46,5 +46,12 @@ namespace Application.Services.Products
         /// <param name="productId">ID of the product to delete</param>
         /// <returns></returns>
         Task DeleteProductAsync(Guid productId, CancellationToken ct);
+
+        /// <summary>
+        /// Decrement stock for a specific product.
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <param name="quantity">Quantity to decrement</param>
+        Task DecrementStockAsync(Guid productId, int quantity, CancellationToken ct);
     }
 }
