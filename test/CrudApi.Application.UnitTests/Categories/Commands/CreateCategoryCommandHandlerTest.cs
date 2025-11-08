@@ -30,7 +30,7 @@ namespace CrudApi.Application.UnitTests.Categories.Commands
             var services = new ServiceCollection();
             services.AddMediatR(typeof(AddCategoryHandler).Assembly);
             services.AddSingleton(_mockService.Object);
-            
+
             var serviceProvider = services.BuildServiceProvider();
             _mediator = serviceProvider.GetRequiredService<IMediator>();
         }
