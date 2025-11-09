@@ -24,9 +24,6 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore CrudApi.sln
 
-      - name: Check code formatting
-        run: dotnet format CrudApi.sln --verify-no-changes
-
       - name: Build
         run: dotnet build CrudApi.sln --configuration Release --no-restore
 

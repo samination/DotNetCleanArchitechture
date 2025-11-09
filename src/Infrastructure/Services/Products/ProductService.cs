@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.Products
 {
-    internal class ProductService : IProductService
+    public class ProductService : IProductService
     {
         #region Constructor
         private readonly ApplicationDbContext _db;
