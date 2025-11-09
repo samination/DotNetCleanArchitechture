@@ -46,10 +46,15 @@ public class ProductServiceTests
         var eventTimestamp = DateTime.UtcNow;
 
         // Act
-        await service.UpdatePriceIfNewerAsync(product.Id, newPrice, eventTimestamp, CancellationToken.None);
+        var result = await service.UpdatePriceIfNewerAsync(product.Id, newPrice, eventTimestamp, CancellationToken.None);
 
         // Assert
         Product updated = await dbContext.Products.FirstAsync(p => p.Id == product.Id);
+
+        result.IsUpdated.ShouldBeTrue();
+        result.PreviousPrice.ShouldBe(10.0);
+        result.CurrentPrice.ShouldBe(newPrice);
+        result.UpdatedAtUtc.ShouldBe(eventTimestamp);
 
         updated.Price.ShouldBe(newPrice);
         updated.UpdatedAt.ShouldBe(eventTimestamp);
@@ -81,10 +86,15 @@ public class ProductServiceTests
         var newPrice = 25.0;
 
         // Act
-        await service.UpdatePriceIfNewerAsync(product.Id, newPrice, olderEventTimestamp, CancellationToken.None);
+        var result = await service.UpdatePriceIfNewerAsync(product.Id, newPrice, olderEventTimestamp, CancellationToken.None);
 
         // Assert
         Product updated = await dbContext.Products.FirstAsync(p => p.Id == product.Id);
+
+        result.IsUpdated.ShouldBeFalse();
+        result.PreviousPrice.ShouldBe(20.0);
+        result.CurrentPrice.ShouldBe(20.0);
+        result.UpdatedAtUtc.ShouldBe(existingUpdatedAt);
 
         updated.Price.ShouldBe(20.0);
         updated.UpdatedAt.ShouldBe(existingUpdatedAt);

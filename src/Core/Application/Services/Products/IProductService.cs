@@ -60,6 +60,6 @@ namespace Application.Services.Products
         /// <param name="productId">Product identifier</param>
         /// <param name="price">New price amount</param>
         /// <param name="priceCreatedAtUtc">Timestamp of the price update</param>
-        Task UpdatePriceIfNewerAsync(Guid productId, double price, DateTime priceCreatedAtUtc, CancellationToken ct);
+        Task<ProductPriceUpdateResult> UpdatePriceIfNewerAsync(Guid productId, double price, DateTime priceCreatedAtUtc, CancellationToken ct);
     }
 }

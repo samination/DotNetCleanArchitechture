@@ -3,6 +3,7 @@ using Infrastructure.Identity;
 using Infrastructure.Messaging.MassTransit;
 using Infrastructure.Middleware;
 using Infrastructure.Services;
+using Infrastructure.Services.Notifications;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ namespace Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             Log.Information("Adding Infrastructure services");
+            services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
             services.AddServices();
             services.AddDatabase(configuration);
             services.AddIdentityInfrastructure(configuration);

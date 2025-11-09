@@ -1,6 +1,7 @@
 using System;
 using Application.IntegrationEvents.Orders;
 using Application.IntegrationEvents.Prices;
+using Application.IntegrationEvents.Products;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,8 +41,10 @@ internal static class Startup
             {
                 rider.AddConsumer<OrderPaidEventConsumer>();
                 rider.AddConsumer<PriceUpdatedConsumer>();
+                rider.AddConsumer<ProductPriceChangedEmailConsumer>();
 
                 rider.AddProducer<Guid, OrderPaidEvent>(kafkaOptions.OrderPaidTopic!);
+                rider.AddProducer<Guid, ProductPriceChangedEvent>(kafkaOptions.ProductPriceChangedTopic!);
 
                 rider.UsingKafka((context, kafka) =>
                 {
@@ -68,6 +71,14 @@ internal static class Startup
                         endpoint =>
                         {
                             endpoint.ConfigureConsumer<PriceUpdatedConsumer>(context);
+                        });
+
+                    kafka.TopicEndpoint<Guid, ProductPriceChangedEvent>(
+                        options.ProductPriceChangedTopic!,
+                        groupId,
+                        endpoint =>
+                        {
+                            endpoint.ConfigureConsumer<ProductPriceChangedEmailConsumer>(context);
                         });
                 });
             });
@@ -97,6 +108,11 @@ internal static class Startup
         if (string.IsNullOrWhiteSpace(options.PriceUpdatedTopic))
         {
             throw new InvalidOperationException("Kafka price updated topic configuration is missing.");
+        }
+
+        if (string.IsNullOrWhiteSpace(options.ProductPriceChangedTopic))
+        {
+            throw new InvalidOperationException("Kafka product price changed topic configuration is missing.");
         }
     }
 }

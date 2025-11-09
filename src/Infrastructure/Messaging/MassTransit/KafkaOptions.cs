@@ -11,6 +11,8 @@ internal sealed class KafkaOptions
     public string? OrderPaidTopic { get; init; }
 
     public string? PriceUpdatedTopic { get; init; }
+
+    public string? ProductPriceChangedTopic { get; init; }
 }
 
 

@@ -205,13 +205,13 @@ namespace Infrastructure.Services.Products
             await _db.SaveChangesAsync(ct);
         }
 
-        public async Task UpdatePriceIfNewerAsync(Guid productId, double price, DateTime priceCreatedAtUtc, CancellationToken ct)
+        public async Task<ProductPriceUpdateResult> UpdatePriceIfNewerAsync(Guid productId, double price, DateTime priceCreatedAtUtc, CancellationToken ct)
         {
             Product? product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productId, ct);
 
             if (product is null)
             {
-                return;
+                return new ProductPriceUpdateResult(false, 0, 0, DateTime.UtcNow);
             }
 
             DateTime utcCreatedAt = priceCreatedAtUtc.Kind switch
@@ -230,13 +230,16 @@ namespace Infrastructure.Services.Products
 
             if (currentUpdatedAtUtc >= utcCreatedAt)
             {
-                return;
+                return new ProductPriceUpdateResult(false, product.Price, product.Price, currentUpdatedAtUtc);
             }
 
+            double previousPrice = product.Price;
             product.Price = price;
             product.SetUpdatedAt(utcCreatedAt);
 
             await _db.SaveChangesAsync(ct);
+
+            return new ProductPriceUpdateResult(true, previousPrice, product.Price, product.UpdatedAt);
         }
 
         #endregion Stock
