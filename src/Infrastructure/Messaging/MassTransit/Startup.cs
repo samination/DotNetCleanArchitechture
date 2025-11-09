@@ -1,5 +1,6 @@
 using System;
 using Application.IntegrationEvents.Orders;
+using Application.IntegrationEvents.Prices;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,7 @@ internal static class Startup
             busConfigurator.AddRider(rider =>
             {
                 rider.AddConsumer<OrderPaidEventConsumer>();
+                rider.AddConsumer<PriceUpdatedConsumer>();
 
                 rider.AddProducer<Guid, OrderPaidEvent>(kafkaOptions.OrderPaidTopic!);
 
@@ -58,6 +60,14 @@ internal static class Startup
                         endpoint =>
                         {
                             endpoint.ConfigureConsumer<OrderPaidEventConsumer>(context);
+                        });
+
+                    kafka.TopicEndpoint<Guid, PriceUpdatedEvent>(
+                        options.PriceUpdatedTopic!,
+                        groupId,
+                        endpoint =>
+                        {
+                            endpoint.ConfigureConsumer<PriceUpdatedConsumer>(context);
                         });
                 });
             });
@@ -82,6 +92,11 @@ internal static class Startup
         if (string.IsNullOrWhiteSpace(options.OrderPaidTopic))
         {
             throw new InvalidOperationException("Kafka order paid topic configuration is missing.");
+        }
+
+        if (string.IsNullOrWhiteSpace(options.PriceUpdatedTopic))
+        {
+            throw new InvalidOperationException("Kafka price updated topic configuration is missing.");
         }
     }
 }

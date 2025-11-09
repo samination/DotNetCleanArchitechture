@@ -53,5 +53,13 @@ namespace Application.Services.Products
         /// <param name="productId">Product identifier</param>
         /// <param name="quantity">Quantity to decrement</param>
         Task DecrementStockAsync(Guid productId, int quantity, CancellationToken ct);
+
+        /// <summary>
+        /// Update the price of a product if the supplied price update is newer.
+        /// </summary>
+        /// <param name="productId">Product identifier</param>
+        /// <param name="price">New price amount</param>
+        /// <param name="priceCreatedAtUtc">Timestamp of the price update</param>
+        Task UpdatePriceIfNewerAsync(Guid productId, double price, DateTime priceCreatedAtUtc, CancellationToken ct);
     }
 }

@@ -205,6 +205,40 @@ namespace Infrastructure.Services.Products
             await _db.SaveChangesAsync(ct);
         }
 
+        public async Task UpdatePriceIfNewerAsync(Guid productId, double price, DateTime priceCreatedAtUtc, CancellationToken ct)
+        {
+            Product? product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productId, ct);
+
+            if (product is null)
+            {
+                return;
+            }
+
+            DateTime utcCreatedAt = priceCreatedAtUtc.Kind switch
+            {
+                DateTimeKind.Utc => priceCreatedAtUtc,
+                DateTimeKind.Local => priceCreatedAtUtc.ToUniversalTime(),
+                _ => DateTime.SpecifyKind(priceCreatedAtUtc, DateTimeKind.Utc)
+            };
+
+            DateTime currentUpdatedAtUtc = product.UpdatedAt.Kind switch
+            {
+                DateTimeKind.Utc => product.UpdatedAt,
+                DateTimeKind.Local => product.UpdatedAt.ToUniversalTime(),
+                _ => DateTime.SpecifyKind(product.UpdatedAt, DateTimeKind.Utc)
+            };
+
+            if (currentUpdatedAtUtc >= utcCreatedAt)
+            {
+                return;
+            }
+
+            product.Price = price;
+            product.SetUpdatedAt(utcCreatedAt);
+
+            await _db.SaveChangesAsync(ct);
+        }
+
         #endregion Stock
 
         #region Helpers

@@ -9,6 +9,8 @@ internal sealed class KafkaOptions
     public string? ConsumerGroupId { get; init; }
 
     public string? OrderPaidTopic { get; init; }
+
+    public string? PriceUpdatedTopic { get; init; }
 }
 
 

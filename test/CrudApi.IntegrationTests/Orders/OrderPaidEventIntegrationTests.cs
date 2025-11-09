@@ -31,7 +31,8 @@ public class OrderPaidEventIntegrationTests : IAsyncLifetime
         {
             BootstrapServers = "localhost:9092",
             ConsumerGroupId = "integration-test-consumer",
-            OrderPaidTopic = "order-paid"
+            OrderPaidTopic = "order-paid",
+            PriceUpdatedTopic = "price-updated"
         });
 
         services.AddMassTransit(busConfigurator =>

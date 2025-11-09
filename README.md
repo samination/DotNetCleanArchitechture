@@ -38,6 +38,39 @@
 * Database Integration using Entity Framework Core.
 * MediatR (CQRS)
   - Implementation of CQRS using MediatR. All controllers will consume the mediator to handle commands and queries.
+* Kafka-driven integrations
+  - Order payments and external price updates are exchanged through Kafka using MassTransit.
+
+## Price Updater Microservice
+
+The repository now includes a companion service dedicated to managing product price versions:
+
+- Location: `PriceUpdater/`
+- Stack: ASP.NET Core Web API + EF Core (SQLite) + MassTransit (Kafka rider)
+- Runs on `http://localhost:5090` by default and builds via `PriceUpdater/PriceUpdater.sln`
+- Persists price versions in the shared MySQL server using the `priceupdate` database
+- Contract: publishes `PriceUpdatedEvent` (`ProductId`, `Price`, `CreatedAtUtc`) on the `price-updated` Kafka topic whenever a new price version is created.
+
+Workflow:
+
+1. `POST /api/prices` in the PriceUpdater service stores a new immutable price record and emits a `PriceUpdatedEvent`.
+2. The main CRUD API subscribes to the same Kafka topic. When it receives an event, it checks whether the price timestamp is newer than the product’s current `UpdatedAt` value.
+3. If the incoming price is fresher, the product price and `UpdatedAt` timestamp are updated atomically.
+
+### Running both services
+
+```bash
+# Terminal 1 – start Kafka (from repo root)
+docker compose -f docker-compose.infrastructure.yml up -d
+
+# Terminal 2 – run the CRUD API
+dotnet run --project src/API/API.csproj
+
+# Terminal 3 – run the Price Updater service
+dotnet run --project PriceUpdater/src/PriceUpdater.API/PriceUpdater.API.csproj
+```
+
+Both services share the Kafka broker configured at `localhost:9092`. Connection strings and topic names can be customised through the respective `appsettings.json` files.
 
 ## How To Use
 
@@ -52,6 +85,12 @@ $ cd dotnet-crud-api
 
 # Restore dependencies
 $ dotnet restore
+
+# Restore dependencies for the price updater
+$ dotnet restore PriceUpdater/PriceUpdater.sln
+
+# Build the price updater separately (optional)
+$ dotnet build PriceUpdater/PriceUpdater.sln
 
 # Run the app
 $ dotnet watch
