@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriceUpdater.Domain", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriceUpdater.Infrastructure", "src\PriceUpdater.Infrastructure\PriceUpdater.Infrastructure.csproj", "{9B0B8E17-4DA5-4BC2-984F-0C5E106BA88F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriceUpdater.UnitTests", "test\PriceUpdater.UnitTests\PriceUpdater.UnitTests.csproj", "{25F637A2-46F2-4FC2-8E40-437527F1FBE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{9B0B8E17-4DA5-4BC2-984F-0C5E106BA88F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B0B8E17-4DA5-4BC2-984F-0C5E106BA88F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B0B8E17-4DA5-4BC2-984F-0C5E106BA88F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25F637A2-46F2-4FC2-8E40-437527F1FBE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25F637A2-46F2-4FC2-8E40-437527F1FBE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25F637A2-46F2-4FC2-8E40-437527F1FBE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25F637A2-46F2-4FC2-8E40-437527F1FBE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

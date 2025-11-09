@@ -10,7 +10,7 @@ using PriceUpdater.Infrastructure.Persistence;
 
 namespace PriceUpdater.Infrastructure.Services;
 
-internal sealed class PriceService : IPriceService
+public sealed class PriceService : IPriceService
 {
     private readonly PriceDbContext _dbContext;
     private readonly ITopicProducer<Guid, PriceUpdatedEvent> _producer;
