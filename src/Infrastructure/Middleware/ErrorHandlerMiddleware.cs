@@ -1,4 +1,5 @@
 ﻿using Domain.Helpers.Exceptions;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -34,25 +35,31 @@ namespace Infrastructure.Middleware
                 var response = context.Response;
                 response.ContentType = "application/json";
                 Guid id = Guid.NewGuid(); // Generate new id for this error
-
+                string errorType = error.GetType().Name;
+                string humanizedErrorType = errorType.Humanize();
+                string message = string.IsNullOrWhiteSpace(error.Message)
+                    ? $"An unexpected {humanizedErrorType.ToLower()} occurred."
+                    : error.Message;
 
                 switch (error)
                 {
                     // Custom Exception - located in Core.Domain.Helpers.Exceptions
                     // You can add as many custom exceptions you would like to handle
                     // Remember to add them to the switch statement with a status code for the response
-                    case CustomException ex:
+                    case CustomException:
                         // custom application error
-                        _logger.LogError($"A Custom Exception Occured. ID: {id} - Message: {error.Message}");
+                        _logger.LogError($"A {humanizedErrorType} occurred. ID: {id} - Message: {message}");
                         response.StatusCode = (int)HttpStatusCode.BadRequest;
                         break;
-                    case KeyNotFoundException ex:
+                    case KeyNotFoundException:
                         // not found error
+                        _logger.LogWarning($"Resource not found ({humanizedErrorType}). ID: {id} - Message: {message}");
                         response.StatusCode = (int)HttpStatusCode.NotFound;
                         break;
                     default:
                         // unhandled error
-                        _logger.LogError(error, error.Message);
+                        _logger.LogError(error, $"An unexpected {humanizedErrorType.ToLower()} occurred. ID: {id} - Message: {message}");
+                        message = $"An unexpected {humanizedErrorType.ToLower()} occurred. Please try again later.";
                         response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         break;
                 }
@@ -60,7 +67,8 @@ namespace Infrastructure.Middleware
                 var result = JsonSerializer.Serialize(new
                 {
                     id = id.ToString(),
-                    message = error?.Message,
+                    type = humanizedErrorType,
+                    message,
                     statusCode = response.StatusCode,
                 });
                 await response.WriteAsync(result);
