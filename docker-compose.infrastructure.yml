@@ -66,6 +66,14 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     restart: unless-stopped
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: unless-stopped
+
 volumes:
   kafka-data:
     driver: local
