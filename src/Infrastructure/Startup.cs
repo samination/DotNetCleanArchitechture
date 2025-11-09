@@ -1,6 +1,6 @@
 ﻿using Data;
 using Infrastructure.Identity;
-using Infrastructure.Messaging.Kafka;
+using Infrastructure.Messaging.MassTransit;
 using Infrastructure.Middleware;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -18,7 +18,7 @@ namespace Infrastructure
             services.AddServices();
             services.AddDatabase(configuration);
             services.AddIdentityInfrastructure(configuration);
-            services.AddKafkaInfrastructure(configuration);
+            services.AddMassTransitInfrastructure(configuration);
             return services;
         }
 
