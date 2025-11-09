@@ -13,23 +13,18 @@ namespace API.Mappings.Categories
             #region Create
 
             CreateMap<CategoryAddRequestDto, Category>()
-                .ReverseMap();
+                .ConstructUsing(dto => new Category(dto.Name, dto.Description));
 
             #endregion Create
 
             #region Read
 
             CreateMap<Category, CategoryResponseDto>()
-                .ReverseMap()
-                .ForAllMembers(x => x.Condition(
-                    (src, dest, property) =>
-                    {
-                        // Let's ignore both null and empty string properties on category
-                        if (property == null) return false;
-                        if ((property is string) && string.IsNullOrEmpty((string)property)) return false;
-
-                        return true;
-                    }));
+                .ForMember(dest => dest.RowVersion, opt => opt.MapFrom(src => src.RowVersion))
+                .ForMember(dest => dest.DeletedAt, opt => opt.MapFrom(src => src.DeletedAt))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt));
 
             CreateMap<PaginatedResult<Category>, PaginatedResponseDto<CategoryResponseDto>>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
@@ -38,7 +33,9 @@ namespace API.Mappings.Categories
 
             #region Update
 
-            CreateMap<CategoryUpdateRequestDto, Category>().ReverseMap();
+            CreateMap<CategoryUpdateRequestDto, Category>()
+                .ConstructUsing(dto => new Category(dto.Id, dto.Name, dto.Description))
+                .AfterMap((dto, entity) => entity.SetConcurrencyToken(dto.RowVersion));
 
             #endregion Update
 

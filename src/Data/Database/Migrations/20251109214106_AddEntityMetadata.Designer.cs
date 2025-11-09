@@ -3,6 +3,7 @@ using System;
 using Data.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Database.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251109214106_AddEntityMetadata")]
+    partial class AddEntityMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,6 +104,7 @@ namespace Data.Database.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
@@ -108,10 +112,10 @@ namespace Data.Database.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<DateTime>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("timestamp(6)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -136,6 +140,7 @@ namespace Data.Database.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
@@ -145,10 +150,10 @@ namespace Data.Database.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("char(36)");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<DateTime>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("timestamp(6)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -180,6 +185,7 @@ namespace Data.Database.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
@@ -190,10 +196,10 @@ namespace Data.Database.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<DateTime>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                        .HasColumnType("timestamp(6)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");

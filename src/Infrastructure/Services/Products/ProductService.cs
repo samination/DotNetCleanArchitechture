@@ -1,10 +1,12 @@
-﻿using Application.Services.Categories;
+﻿using System;
+using Application.Services.Categories;
 using Application.Services.Products;
 using Data.Database;
 using Domain.Entitites.Categories;
 using Domain.Entitites.Products;
 using Domain.Helpers.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Infrastructure.Services.Products
 {
@@ -146,19 +148,47 @@ namespace Infrastructure.Services.Products
         public async Task<Product> UpdateProductAsync(Product productToUpdate, CancellationToken ct)
         {
             // Make sure that the product actually exist in the database
-            Product product = await getProductByIdAsync(productToUpdate.Id, ct);
+            Product? product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productToUpdate.Id, ct);
+
+            if (product is null)
+            {
+                throw new KeyNotFoundException($"The product with ID: {productToUpdate.Id} was not found in the database.");
+            }
 
             // Validation before we update the product
             // We do not want any product in the database with the same names
-            if (product.Name != productToUpdate.Name && await _db.Products.AnyAsync(x => x.Name == productToUpdate.Name))
+            if (!product.RowVersion.SequenceEqual(productToUpdate.RowVersion))
+            {
+                throw new ConcurrencyException("The product has been modified by another process. Please reload and try again.");
+            }
+
+            if (!string.Equals(product.Name, productToUpdate.Name, StringComparison.OrdinalIgnoreCase) &&
+                await _db.Products.AsNoTracking().AnyAsync(x => x.Name == productToUpdate.Name, ct))
             {
                 throw new CustomException($"A product with the name {productToUpdate.Name} already exist in the database. Please choose another name for the product and try again.");
             }
 
+            // Make sure the category still exists
+            await _categories.GetCategoryByIdAsync(productToUpdate.CategoryId, ct);
+
             // Validation has no problems, let's continue
-            _db.Products.Update(productToUpdate);
-            await _db.SaveChangesAsync(ct);
-            return productToUpdate;
+            _db.Entry(product).Property(x => x.RowVersion).OriginalValue = productToUpdate.RowVersion;
+            product.UpdateDetails(
+                productToUpdate.Name,
+                productToUpdate.Description,
+                productToUpdate.Price,
+                productToUpdate.Stock,
+                productToUpdate.CategoryId);
+
+            try
+            {
+                await _db.SaveChangesAsync(ct);
+                return product;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConcurrencyException("The product update could not be completed because the resource was modified by another process.");
+            }
         }
 
         #endregion Update (U)
@@ -172,8 +202,14 @@ namespace Infrastructure.Services.Products
         /// <param name="productId">ID of the product to delete</param>
         public async Task DeleteProductAsync(Guid productId, CancellationToken ct)
         {
-            Product product = await getProductByIdAsync(productId, ct);
-            _db.Products.Remove(product);
+            Product? product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productId, ct);
+
+            if (product is null)
+            {
+                throw new KeyNotFoundException($"The product with ID: {productId} was not found in the database.");
+            }
+
+            product.MarkDeleted();
             await _db.SaveChangesAsync(ct);
         }
 
@@ -202,7 +238,14 @@ namespace Infrastructure.Services.Products
 
             product.Stock -= quantity;
 
-            await _db.SaveChangesAsync(ct);
+            try
+            {
+                await _db.SaveChangesAsync(ct);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConcurrencyException("The product stock update could not be completed because the resource was modified by another process.");
+            }
         }
 
         public async Task<ProductPriceUpdateResult> UpdatePriceIfNewerAsync(Guid productId, double price, DateTime priceCreatedAtUtc, CancellationToken ct)
@@ -237,7 +280,14 @@ namespace Infrastructure.Services.Products
             product.Price = price;
             product.SetUpdatedAt(utcCreatedAt);
 
-            await _db.SaveChangesAsync(ct);
+            try
+            {
+                await _db.SaveChangesAsync(ct);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConcurrencyException("The product price update could not be completed because the resource was modified by another process.");
+            }
 
             return new ProductPriceUpdateResult(true, previousPrice, product.Price, product.UpdatedAt);
         }

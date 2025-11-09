@@ -10,27 +10,27 @@ namespace API.Mappings.Products
         {
             #region Create
 
-            CreateMap<ProductCreateRequestDto, Product>().ReverseMap();
+            CreateMap<ProductCreateRequestDto, Product>()
+                .ConstructUsing(dto => new Product(dto.Name, dto.Description, dto.Price, dto.Stock, dto.CategoryId));
 
             #endregion Create
 
             #region Read
 
-            CreateMap<Product, ProductResponseDto>().ReverseMap()
-                .ForAllMembers(x => x.Condition(
-                    (src, dest, property) =>
-                    {
-                        // Let's ignore both null and empty string properties on product
-                        if (property == null) return false;
-                        if ((property is string) && string.IsNullOrEmpty((string)property)) return false;
-                        return true;
-                    }));
+            CreateMap<Product, ProductResponseDto>()
+                .ForMember(dest => dest.RowVersion, opt => opt.MapFrom(src => src.RowVersion))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
+                .ForMember(dest => dest.DeletedAt, opt => opt.MapFrom(src => src.DeletedAt));
 
             #endregion Read
 
             #region Update
 
-            CreateMap<ProductUpdateRequestDto, Product>().ReverseMap();
+            CreateMap<ProductUpdateRequestDto, Product>()
+                .ConstructUsing(dto => new Product(dto.Id, dto.Name, dto.Description, dto.Price, dto.Stock, dto.CategoryId))
+                .AfterMap((dto, entity) => entity.SetConcurrencyToken(dto.RowVersion));
 
             #endregion Update
         }

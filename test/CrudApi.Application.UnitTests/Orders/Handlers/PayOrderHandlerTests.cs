@@ -26,10 +26,8 @@ public class PayOrderHandlerTests
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
 
-        var order = new Order
-        {
-            ProductId = Guid.NewGuid()
-        };
+        var productId = Guid.NewGuid();
+        var order = new Order(productId);
 
         _orderServiceMock
             .Setup(service => service.PayOrderAsync(order.Id, cancellationToken))

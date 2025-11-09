@@ -30,9 +30,7 @@ namespace Infrastructure.Services.Orders
                 throw new CustomException($"The product '{product.Name}' is out of stock.");
             }
 
-            order.PaymentStatus = PaymentStatus.Pending;
-            order.CreatedAt = DateTime.UtcNow;
-            order.MarkUpdated();
+            order.MarkPending();
 
             _db.Orders.Add(order);
             await _db.SaveChangesAsync(ct);
@@ -61,14 +59,7 @@ namespace Infrastructure.Services.Orders
                 throw new KeyNotFoundException($"The order with ID: {orderId} was not found in the database.");
             }
 
-            if (order.PaymentStatus == PaymentStatus.Paid)
-            {
-                throw new CustomException("The order has already been paid.");
-            }
-
-            order.PaymentStatus = PaymentStatus.Paid;
-            order.PaidAt = DateTime.UtcNow;
-            order.MarkUpdated();
+            order.MarkPaid(DateTime.UtcNow);
 
             await _db.SaveChangesAsync(ct);
 

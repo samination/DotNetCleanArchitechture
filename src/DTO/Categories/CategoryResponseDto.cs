@@ -1,9 +1,16 @@
-﻿namespace DTO.Categories
+﻿using System;
+
+namespace DTO.Categories
 {
     public record CategoryResponseDto
     (
         Guid Id,
         string Name,
-        string Description
+        string Description,
+        DateTime CreatedAt,
+        DateTime UpdatedAt,
+        bool IsDeleted,
+        DateTime? DeletedAt,
+        byte[] RowVersion
     );
 }

@@ -28,14 +28,7 @@ public class ProductServiceTests
         await using var dbContext = CreateDbContext(nameof(UpdatePriceIfNewerAsync_ShouldUpdatePrice_WhenEventIsNewer));
         var service = new ProductService(dbContext, _categoryServiceMock.Object);
 
-        var product = new Product
-        {
-            Name = "Test Product",
-            Description = "Description",
-            Price = 10.0,
-            Stock = 5,
-            CategoryId = Guid.NewGuid()
-        };
+        var product = new Product("Test Product", "Description", 10.0, 5, Guid.NewGuid());
 
         product.SetUpdatedAt(DateTime.UtcNow.AddHours(-2));
 
@@ -67,14 +60,7 @@ public class ProductServiceTests
         await using var dbContext = CreateDbContext(nameof(UpdatePriceIfNewerAsync_ShouldIgnore_WhenEventIsOlder));
         var service = new ProductService(dbContext, _categoryServiceMock.Object);
 
-        var product = new Product
-        {
-            Name = "Existing Product",
-            Description = "Description",
-            Price = 20.0,
-            Stock = 10,
-            CategoryId = Guid.NewGuid()
-        };
+        var product = new Product("Existing Product", "Description", 20.0, 10, Guid.NewGuid());
 
         var existingUpdatedAt = DateTime.UtcNow;
         product.SetUpdatedAt(existingUpdatedAt);

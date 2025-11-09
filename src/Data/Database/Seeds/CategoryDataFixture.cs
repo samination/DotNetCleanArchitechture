@@ -19,11 +19,17 @@ internal static class CategoryDataFixture
     {
         Randomizer.Seed = new Random(RandomSeed);
 
-        var faker = new Faker<Category>("en")
-            .RuleFor(c => c.Name, (f, _) => $"{f.Commerce.Department()} {f.UniqueIndex}")
-            .RuleFor(c => c.Description, (f, _) => f.Commerce.ProductDescription());
+        var faker = new Faker("en");
+        var categories = new List<Category>(CategoryCount);
 
-        return faker.Generate(CategoryCount).AsReadOnly();
+        for (var index = 0; index < CategoryCount; index++)
+        {
+            string name = $"{faker.Commerce.Department()} {index}";
+            string description = faker.Commerce.ProductDescription();
+            categories.Add(new Category(name, description));
+        }
+
+        return categories.AsReadOnly();
     }
 }
 

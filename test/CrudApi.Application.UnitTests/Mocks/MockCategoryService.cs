@@ -18,16 +18,8 @@ namespace CrudApi.Application.UnitTests.Mocks
             // Create new list of categories and add the categories
             List<Category> categories = new List<Category>
             {
-                new Category
-                {
-                    Name = "T-Shirts",
-                    Description = "This category contains only t-shirts."
-                },
-                new Category
-                {
-                    Name = "Shorts",
-                    Description = "This category will only contain shorts."
-                }
+                new Category("T-Shirts", "This category contains only t-shirts."),
+                new Category("Shorts", "This category will only contain shorts.")
             };
 
             // Initialize new Mock of type ICategoryService

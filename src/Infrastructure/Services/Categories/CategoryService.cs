@@ -1,9 +1,11 @@
-﻿using Application.Common.Models;
+﻿using System;
+using Application.Common.Models;
 using Application.Services.Categories;
 using Data.Database;
 using Domain.Entitites.Categories;
 using Domain.Helpers.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Infrastructure.Services.Categories
 {
@@ -116,19 +118,39 @@ namespace Infrastructure.Services.Categories
         public async Task<Category> UpdateCategoryAsync(Category categoryToUpdate, CancellationToken ct)
         {
             // Make sure that the category exist in the database
-            Category category = await getCategoryByIdAsync(categoryToUpdate.Id, ct);
+            Category? category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == categoryToUpdate.Id, ct);
+
+            if (category is null)
+            {
+                throw new KeyNotFoundException("The category was not found in the database.");
+            }
 
             // Validation before updating the category
             // We don't want any categories in the database with the same name
-            if (category.Name != categoryToUpdate.Name && await _db.Categories.AnyAsync(x => x.Name == categoryToUpdate.Name))
+            if (!category.RowVersion.SequenceEqual(categoryToUpdate.RowVersion))
+            {
+                throw new ConcurrencyException("The category has been modified by another process. Please reload and try again.");
+            }
+
+            if (!string.Equals(category.Name, categoryToUpdate.Name, StringComparison.OrdinalIgnoreCase) &&
+                await _db.Categories.AsNoTracking().AnyAsync(x => x.Name == categoryToUpdate.Name, ct))
             {
                 throw new CustomException($"A category with the name {categoryToUpdate.Name} already exist in the database. Please choose another name.");
             }
 
             // No problems, let's update the category
-            _db.Categories.Update(categoryToUpdate);
-            await _db.SaveChangesAsync(cancellationToken: ct);
-            return categoryToUpdate;
+            _db.Entry(category).Property(x => x.RowVersion).OriginalValue = categoryToUpdate.RowVersion;
+            category.UpdateDetails(categoryToUpdate.Name, categoryToUpdate.Description);
+
+            try
+            {
+                await _db.SaveChangesAsync(cancellationToken: ct);
+                return category;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConcurrencyException("The category update could not be completed because the resource was modified by another process.");
+            }
         }
 
         #endregion Update (U)
@@ -142,16 +164,33 @@ namespace Infrastructure.Services.Categories
         /// <param name="id">ID of the category to delete</param>
         public async Task DeleteCategoryAsync(Guid id, CancellationToken ct)
         {
+            await using var transaction = await _db.Database.BeginTransactionAsync(ct);
+
             // Make sure no products are connected to the category
-            if (await _db.Products.AnyAsync(x => x.CategoryId == id))
+            if (await _db.Products.AnyAsync(x => x.CategoryId == id, ct))
             {
                 throw new CustomException("There are products connected to this category. Please remove the products from the category and try again.");
             }
 
             // No products connected. Continue removing the category from the database
-            Category category = await getCategoryByIdAsync(id, ct);
-            _db.Categories.Remove(category);
-            await _db.SaveChangesAsync(cancellationToken: ct);
+            Category? category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id, ct);
+
+            if (category is null)
+            {
+                throw new KeyNotFoundException("The category was not found in the database.");
+            }
+
+            category.MarkDeleted();
+
+            try
+            {
+                await _db.SaveChangesAsync(cancellationToken: ct);
+                await transaction.CommitAsync(ct);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConcurrencyException("The category delete operation could not be completed because the resource was modified by another process.");
+            }
         }
 
         #endregion Delete (D)

@@ -136,20 +136,14 @@ public class OrderPaidEventIntegrationTests : IAsyncLifetime
                 throw new KeyNotFoundException($"Order with id '{orderId}' not found.");
             }
 
-            order.PaymentStatus = PaymentStatus.Paid;
-            order.PaidAt = DateTime.UtcNow;
-            order.MarkUpdated();
+            order.MarkPaid(DateTime.UtcNow);
 
             return Task.FromResult(order);
         }
 
         private static Order CreateOrder(Guid id, Guid productId)
         {
-            var order = new Order
-            {
-                ProductId = productId,
-                PaymentStatus = PaymentStatus.Pending
-            };
+            var order = new Order(productId);
 
             SetOrderId(order, id);
 
