@@ -40,6 +40,8 @@
   - Implementation of CQRS using MediatR. All controllers will consume the mediator to handle commands and queries.
 * Kafka-driven integrations
   - Order payments and external price updates are exchanged through Kafka using MassTransit.
+* Centralized logging (ELK-ready)
+  - Ship structured Serilog events into Elasticsearch and explore them through Kibana.
 
 ## Price Updater Microservice
 
@@ -71,6 +73,19 @@ dotnet run --project PriceUpdater/src/PriceUpdater.API/PriceUpdater.API.csproj
 ```
 
 Both services share the Kafka broker configured at `localhost:9092`. Connection strings and topic names can be customised through the respective `appsettings.json` files.
+
+### Observability with ELK
+
+```bash
+# Boot Elasticsearch and Kibana alongside the existing infrastructure stack
+docker compose -f docker-compose.infrastructure.yml up -d elasticsearch kibana
+```
+
+With the stack running:
+
+- API logs are shipped automatically to Elasticsearch (default URI `http://localhost:9200`).
+- Explore and query log events from Kibana at [http://localhost:5601](http://localhost:5601).
+- Index name pattern defaults to `crudapi-logs-YYYY.MM.DD`; tweak it in `src/API/Configurations/appsettings.json`.
 
 ## How To Use
 

@@ -11,6 +11,14 @@ Log.Information("Starting Web API...");
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext();
+});
+
 // Add services to the container.
 builder.Host.AddConfigurations();
 
