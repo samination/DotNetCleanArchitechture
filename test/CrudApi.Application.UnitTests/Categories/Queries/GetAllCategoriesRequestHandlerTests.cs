@@ -24,7 +24,7 @@ namespace CrudApi.Application.UnitTests.Categories.Queries
         {
             var handler = new GetAllCategoriesHandler(_mockCategoryService.Object);
 
-            var result = await handler.Handle(new GetAllCategoriesQuery(1, 10), CancellationToken.None);
+            var result = await handler.Handle(new GetAllCategoriesQuery(2, 20), CancellationToken.None);
 
             result.ShouldBeOfType<PaginatedResult<Category>>();
 

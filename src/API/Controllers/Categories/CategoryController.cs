@@ -4,7 +4,6 @@ using AutoMapper;
 using Domain.Entitites.Categories;
 using DTO.Categories;
 using DTO.Common;
-using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,10 +36,6 @@ namespace API.Controllers.Categories
         public async Task<IActionResult> GetCategoryById(Guid id, CancellationToken ct)
         {
             var category = await _mediator.Send(new GetCategoryByIdQuery(id), ct);
-            if (category is null)
-            {
-                return NotFound();
-            }
 
             var categoryDto = _mapper.Map<CategoryResponseDto>(category);
             return Ok(categoryDto);

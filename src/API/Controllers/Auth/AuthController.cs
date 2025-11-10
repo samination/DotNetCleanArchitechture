@@ -2,9 +2,6 @@ using Application.Services.Identity;
 using DTO.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace API.Controllers.Auth
 {

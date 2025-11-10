@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 
 namespace Application.Common.Models;
 
@@ -18,7 +16,7 @@ public sealed class PaginatedResult<T>
             throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than or equal to 1.");
         }
 
-        var materializedItems = items?.ToList() ?? new List<T>();
+        var materializedItems = items.ToList();
 
         Items = materializedItems.AsReadOnly();
         TotalCount = totalCount;

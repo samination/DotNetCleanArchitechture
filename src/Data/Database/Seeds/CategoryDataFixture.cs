@@ -19,7 +19,7 @@ internal static class CategoryDataFixture
     {
         Randomizer.Seed = new Random(RandomSeed);
 
-        var faker = new Faker("en");
+        var faker = new Faker();
         var categories = new List<Category>(CategoryCount);
 
         for (var index = 0; index < CategoryCount; index++)

@@ -9,10 +9,7 @@ using Serilog;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 
 StaticLogger.EnsureLoggerIsInitialized();
 Log.Information("Starting Web API...");

@@ -20,7 +20,7 @@ namespace CrudApi.Application.UnitTests.Categories.Commands
         {
             _mockService = MockCategoryService.GetCategoryService();
 
-        _category = new Category("Underwear", "This category will contain only underwear");
+            _category = new Category("Underwear", "This category will contain only underwear");
 
             // Set up MediatR with the handler
             var services = new ServiceCollection();
