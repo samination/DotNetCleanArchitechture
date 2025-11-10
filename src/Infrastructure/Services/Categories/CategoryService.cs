@@ -116,41 +116,41 @@ namespace Infrastructure.Services.Categories
         /// and that the category we would like to update isn't of the same name as the update data.<br />
         /// Finally it will update the entity in the database and return the updated values.
         /// </summary>
-        /// <param name="categoryToUpdate">The category we would like to update</param>
+        /// <param name="category">The category we would like to update</param>
         /// <returns>The updated category</returns>
         /// <exception cref="CustomException">Thrown if a category in the database with the same name already exists</exception>
         /// <param name="ct">Cancellation token for the operation.</param>
-        public async Task<Category> UpdateCategoryAsync(Category categoryToUpdate, CancellationToken ct)
+        public async Task<Category> UpdateCategoryAsync(Category category, CancellationToken ct)
         {
             // Make sure that the category exist in the database
-            Category? category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == categoryToUpdate.Id, ct);
+            Category? existingCategory = await _db.Categories.FirstOrDefaultAsync(x => x.Id == category.Id, ct);
 
-            if (category is null)
+            if (existingCategory is null)
             {
                 throw new KeyNotFoundException("The category was not found in the database.");
             }
 
             // Validation before updating the category
             // We don't want any categories in the database with the same name
-            if (!category.RowVersion.SequenceEqual(categoryToUpdate.RowVersion))
+            if (!existingCategory.RowVersion.SequenceEqual(category.RowVersion))
             {
                 throw new ConcurrencyException("The category has been modified by another process. Please reload and try again.");
             }
 
-            if (!string.Equals(category.Name, categoryToUpdate.Name, StringComparison.OrdinalIgnoreCase) &&
-                await _db.Categories.AsNoTracking().AnyAsync(x => x.Name == categoryToUpdate.Name, ct))
+            if (!string.Equals(existingCategory.Name, category.Name, StringComparison.OrdinalIgnoreCase) &&
+                await _db.Categories.AsNoTracking().AnyAsync(x => x.Name == category.Name, ct))
             {
-                throw new CustomException($"A category with the name {categoryToUpdate.Name} already exist in the database. Please choose another name.");
+                throw new CustomException($"A category with the name {category.Name} already exist in the database. Please choose another name.");
             }
 
             // No problems, let's update the category
-            _db.Entry(category).Property(x => x.RowVersion).OriginalValue = categoryToUpdate.RowVersion;
-            category.UpdateDetails(categoryToUpdate.Name, categoryToUpdate.Description);
+            _db.Entry(existingCategory).Property(x => x.RowVersion).OriginalValue = category.RowVersion;
+            existingCategory.UpdateDetails(category.Name, category.Description);
 
             try
             {
                 await _db.SaveChangesAsync(cancellationToken: ct);
-                return category;
+                return existingCategory;
             }
             catch (DbUpdateConcurrencyException)
             {

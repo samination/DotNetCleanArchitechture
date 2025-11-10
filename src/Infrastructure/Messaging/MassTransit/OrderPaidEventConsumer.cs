@@ -33,7 +33,10 @@ internal sealed class OrderPaidEventConsumer : IConsumer<OrderPaidEvent>
                 ex,
                 "Failed to process OrderPaid message for OrderId {OrderId}",
                 context.Message.OrderId);
-            throw;
+
+            throw new InvalidOperationException(
+                $"Failed to process OrderPaid message for OrderId '{context.Message.OrderId}' and ProductId '{context.Message.ProductId}'.",
+                ex);
         }
     }
 }

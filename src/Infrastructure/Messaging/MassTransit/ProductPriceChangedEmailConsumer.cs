@@ -48,7 +48,13 @@ internal sealed class ProductPriceChangedEmailConsumer : IConsumer<ProductPriceC
                 ex,
                 "Failed to process ProductPriceChangedEvent for product {ProductId}.",
                 context.Message.ProductId);
-            throw;
+
+            throw new InvalidOperationException(
+                string.Format(
+                    "Failed to process ProductPriceChangedEvent for product '{0}' affecting {1} orders.",
+                    context.Message.ProductId,
+                    context.Message.AffectedOrderIds.Count),
+                ex);
         }
     }
 }

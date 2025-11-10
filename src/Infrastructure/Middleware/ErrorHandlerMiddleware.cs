@@ -42,10 +42,16 @@ namespace Infrastructure.Middleware
                 int statusCode;
                 string title;
 
+                const string WarningTemplate = "{ErrorSummary} ID: {ErrorId} - Message: {ErrorMessage}";
+
                 switch (error)
                 {
                     case ConcurrencyException:
-                        _logger.LogWarning($"A concurrency conflict occurred. ID: {id} - Message: {message}");
+                        _logger.LogWarning(
+                            WarningTemplate,
+                            "A concurrency conflict occurred.",
+                            id,
+                            message);
                         statusCode = StatusCodes.Status409Conflict;
                         title = "Concurrency conflict";
                         break;
@@ -54,20 +60,35 @@ namespace Infrastructure.Middleware
                     // Remember to add them to the switch statement with a status code for the response
                     case CustomException:
                         // custom application error
-                        _logger.LogError($"A {humanizedErrorType} occurred. ID: {id} - Message: {message}");
+                        _logger.LogError(
+                            "A {ErrorType} occurred. ID: {ErrorId} - Message: {ErrorMessage}",
+                            humanizedErrorType,
+                            id,
+                            message);
                         statusCode = StatusCodes.Status400BadRequest;
                         title = humanizedErrorType;
                         break;
                     case KeyNotFoundException:
                         // not found error
-                        _logger.LogWarning($"Resource not found ({humanizedErrorType}). ID: {id} - Message: {message}");
+                        var resourceSummary = $"Resource not found ({humanizedErrorType})";
+                        _logger.LogWarning(
+                            WarningTemplate,
+                            resourceSummary,
+                            id,
+                            message);
                         statusCode = StatusCodes.Status404NotFound;
                         title = "Resource not found";
                         break;
                     default:
                         // unhandled error
-                        _logger.LogError(error, $"An unexpected {humanizedErrorType.ToLower()} occurred. ID: {id} - Message: {message}");
-                        message = $"An unexpected {humanizedErrorType.ToLower()} occurred. Please try again later.";
+                        var loweredErrorType = humanizedErrorType.ToLowerInvariant();
+                        _logger.LogError(
+                            error,
+                            "An unexpected {ErrorType} occurred. ID: {ErrorId} - Message: {ErrorMessage}",
+                            loweredErrorType,
+                            id,
+                            message);
+                        message = $"An unexpected {loweredErrorType} occurred. Please try again later.";
                         statusCode = StatusCodes.Status500InternalServerError;
                         title = "Unexpected error";
                         break;

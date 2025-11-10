@@ -45,37 +45,37 @@ namespace Data.Database
 
         private static void ApplyGlobalEntityConfiguration(ModelBuilder builder)
         {
-            foreach (var entityType in builder.Model.GetEntityTypes())
+            foreach (var clrType in builder.Model.GetEntityTypes().Select(entityType => entityType.ClrType))
             {
-                if (!typeof(Base).IsAssignableFrom(entityType.ClrType))
+                if (!typeof(Base).IsAssignableFrom(clrType))
                 {
                     continue;
                 }
 
-                builder.Entity(entityType.ClrType)
+                builder.Entity(clrType)
                     .Property<DateTime>(nameof(Base.CreatedAt))
                     .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
-                builder.Entity(entityType.ClrType)
+                builder.Entity(clrType)
                     .Property<DateTime>(nameof(Base.UpdatedAt))
                     .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
-                builder.Entity(entityType.ClrType)
+                builder.Entity(clrType)
                     .Property<DateTime?>(nameof(Base.DeletedAt))
                     .HasConversion(
                         v => v,
                         v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v);
 
-                builder.Entity(entityType.ClrType)
+                builder.Entity(clrType)
                     .Property<bool>(nameof(Base.IsDeleted))
                     .HasDefaultValue(false);
 
-                builder.Entity(entityType.ClrType)
+                builder.Entity(clrType)
                     .Property<byte[]>(nameof(Base.RowVersion))
                     .IsRowVersion();
 
-                var filter = CreateIsDeletedRestriction(entityType.ClrType);
-                builder.Entity(entityType.ClrType).HasQueryFilter(filter);
+                var filter = CreateIsDeletedRestriction(clrType);
+                builder.Entity(clrType).HasQueryFilter(filter);
             }
         }
 

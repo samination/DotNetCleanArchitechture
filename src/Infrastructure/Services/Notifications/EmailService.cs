@@ -65,7 +65,13 @@ public sealed class EmailService : IEmailService
                 ex,
                 "Failed to send product price change notification email for product {ProductId}.",
                 priceChangedEvent.ProductId);
-            throw;
+
+            throw new InvalidOperationException(
+                string.Format(
+                    "Failed to send product price change notification email for product '{0}' to '{1}'.",
+                    priceChangedEvent.ProductId,
+                    _options.NotificationRecipient),
+                ex);
         }
     }
 

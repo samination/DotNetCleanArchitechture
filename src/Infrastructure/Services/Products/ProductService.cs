@@ -147,49 +147,49 @@ namespace Infrastructure.Services.Products
         /// and that the product we would like to update isn't of the same name as the update data.<br />
         /// Finally it will update the entity in the database and return the updated values.
         /// </summary>
-        /// <param name="productToUpdate">The product we would like to update</param>
+        /// <param name="product">The product we would like to update</param>
         /// <returns>The updated product</returns>
         /// <exception cref="CustomException">Thrown if a product in the database with the same name already exists</exception>
         /// <param name="ct">Cancellation token for the operation.</param>
-        public async Task<Product> UpdateProductAsync(Product productToUpdate, CancellationToken ct)
+        public async Task<Product> UpdateProductAsync(Product product, CancellationToken ct)
         {
             // Make sure that the product actually exist in the database
-            Product? product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productToUpdate.Id, ct);
+            Product? existingProduct = await _db.Products.FirstOrDefaultAsync(x => x.Id == product.Id, ct);
 
-            if (product is null)
+            if (existingProduct is null)
             {
-                throw new KeyNotFoundException($"The product with ID: {productToUpdate.Id} was not found in the database.");
+                throw new KeyNotFoundException($"The product with ID: {product.Id} was not found in the database.");
             }
 
             // Validation before we update the product
             // We do not want any product in the database with the same names
-            if (!product.RowVersion.SequenceEqual(productToUpdate.RowVersion))
+            if (!existingProduct.RowVersion.SequenceEqual(product.RowVersion))
             {
                 throw new ConcurrencyException("The product has been modified by another process. Please reload and try again.");
             }
 
-            if (!string.Equals(product.Name, productToUpdate.Name, StringComparison.OrdinalIgnoreCase) &&
-                await _db.Products.AsNoTracking().AnyAsync(x => x.Name == productToUpdate.Name, ct))
+            if (!string.Equals(existingProduct.Name, product.Name, StringComparison.OrdinalIgnoreCase) &&
+                await _db.Products.AsNoTracking().AnyAsync(x => x.Name == product.Name, ct))
             {
-                throw new CustomException($"A product with the name {productToUpdate.Name} already exist in the database. Please choose another name for the product and try again.");
+                throw new CustomException($"A product with the name {product.Name} already exist in the database. Please choose another name for the product and try again.");
             }
 
             // Make sure the category still exists
-            await _categories.GetCategoryByIdAsync(productToUpdate.CategoryId, ct);
+            await _categories.GetCategoryByIdAsync(product.CategoryId, ct);
 
             // Validation has no problems, let's continue
-            _db.Entry(product).Property(x => x.RowVersion).OriginalValue = productToUpdate.RowVersion;
-            product.UpdateDetails(
-                productToUpdate.Name,
-                productToUpdate.Description,
-                productToUpdate.Price,
-                productToUpdate.Stock,
-                productToUpdate.CategoryId);
+            _db.Entry(existingProduct).Property(x => x.RowVersion).OriginalValue = product.RowVersion;
+            existingProduct.UpdateDetails(
+                product.Name,
+                product.Description,
+                product.Price,
+                product.Stock,
+                product.CategoryId);
 
             try
             {
                 await _db.SaveChangesAsync(ct);
-                return product;
+                return existingProduct;
             }
             catch (DbUpdateConcurrencyException)
             {

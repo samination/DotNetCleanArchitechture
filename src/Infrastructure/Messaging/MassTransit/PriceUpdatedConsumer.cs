@@ -86,7 +86,14 @@ internal sealed class PriceUpdatedConsumer : IConsumer<PriceUpdatedEvent>
                 ex,
                 "Failed to process price update for product {ProductId}",
                 context.Message.ProductId);
-            throw;
+
+            throw new InvalidOperationException(
+                string.Format(
+                    "Failed to process price update for product '{0}' with incoming price '{1}' at '{2:O}'.",
+                    context.Message.ProductId,
+                    context.Message.Price,
+                    context.Message.CreatedAtUtc),
+                ex);
         }
     }
 }
