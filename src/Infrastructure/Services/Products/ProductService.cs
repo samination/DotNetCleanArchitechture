@@ -34,10 +34,11 @@ namespace Infrastructure.Services.Products
         /// <param name="product">Product for creation in database</param>
         /// <returns>The created product in the database</returns>
         /// <exception cref="CustomException">Thrown if a product already exist in the database with the same name</exception>
+        /// <param name="ct">Cancellation token for the operation.</param>
         public async Task<Product> CreateProductAsync(Product product, CancellationToken ct)
         {
             // Make sure that we do not have any products in the database with the same name
-            if (await _db.Products.AsNoTracking().AnyAsync(x => x.Name == product.Name))
+            if (await _db.Products.AsNoTracking().AnyAsync(x => x.Name == product.Name, ct))
                 throw new CustomException($"A product with the name {product.Name} already exists.");
 
             // Make sure that the category exist, before adding the product to the database
@@ -59,6 +60,7 @@ namespace Infrastructure.Services.Products
         /// </summary>
         /// <param name="productId">ID of the product to find in the database</param>
         /// <returns>A single product matching the provided ID in the request</returns>
+        /// <param name="ct">Cancellation token for the operation.</param>
         public async Task<Product> GetProductByIdAsync(Guid productId, CancellationToken ct)
         {
             // Request helper method to get the product
@@ -71,6 +73,7 @@ namespace Infrastructure.Services.Products
         /// </summary>
         /// <param name="name">Name of the product</param>
         /// <returns>A single product matching the name specified for the request</returns>
+        /// <param name="ct">Cancellation token for the operation.</param>
         public async Task<Product> GetProductByNameAsync(string name, CancellationToken ct)
         {
             // Request helper method to get the product
@@ -84,6 +87,7 @@ namespace Infrastructure.Services.Products
         /// </summary>
         /// <returns>A list of products from the database</returns>
         /// <exception cref="KeyNotFoundException">Thrown if no products are available in the database</exception>
+        /// <param name="ct">Cancellation token for the operation.</param>
         public async Task<List<Product>> GetProductsAsync(CancellationToken ct)
         {
             // Get the products from the database
@@ -92,7 +96,7 @@ namespace Infrastructure.Services.Products
                 .ToListAsync(ct);
 
             // Check that we actually got some products from the database
-            if (products.Count() == 0)
+            if (products.Count == 0)
             {
                 // No products were available in the database
                 throw new KeyNotFoundException("There are no products in the database. Please add one or more products and try again.");
@@ -111,6 +115,7 @@ namespace Infrastructure.Services.Products
         /// <param name="categoryId">The category to get the products for</param>
         /// <returns>A list of products within a specific category</returns>
         /// <exception cref="KeyNotFoundException">Thrown if no products are available within that specific category</exception>
+        /// <param name="ct">Cancellation token for the operation.</param>
         public async Task<List<Product>> GetProductsByCategoryIdAsync(Guid categoryId, CancellationToken ct)
         {
             // Make sure that the category exists before requesting products
@@ -123,7 +128,7 @@ namespace Infrastructure.Services.Products
                 .ToListAsync(ct);
 
             // Make sure we got some products
-            if (products.Count() == 0)
+            if (products.Count == 0)
             {
                 throw new KeyNotFoundException($"The category {category.Name} contains 0 products. Add one or more products to the category and try again.");
             }
@@ -145,6 +150,7 @@ namespace Infrastructure.Services.Products
         /// <param name="productToUpdate">The product we would like to update</param>
         /// <returns>The updated product</returns>
         /// <exception cref="CustomException">Thrown if a product in the database with the same name already exists</exception>
+        /// <param name="ct">Cancellation token for the operation.</param>
         public async Task<Product> UpdateProductAsync(Product productToUpdate, CancellationToken ct)
         {
             // Make sure that the product actually exist in the database
@@ -200,6 +206,7 @@ namespace Infrastructure.Services.Products
         ///  If the product exist it will be removed and the database will be updated.
         /// </summary>
         /// <param name="productId">ID of the product to delete</param>
+        /// <param name="ct">Cancellation token for the operation.</param>
         public async Task DeleteProductAsync(Guid productId, CancellationToken ct)
         {
             Product? product = await _db.Products.FirstOrDefaultAsync(x => x.Id == productId, ct);
@@ -303,10 +310,11 @@ namespace Infrastructure.Services.Products
         /// <param name="id">ID of the product to find in the database</param>
         /// <returns>Requested product</returns>
         /// <exception cref="KeyNotFoundException">Thrown if no product in the database has the given ID</exception>
+        /// <param name="ct">Cancellation token for the operation.</param>
         private async Task<Product> getProductByIdAsync(Guid id, CancellationToken ct)
         {
-            Product product = await _db.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
-            if (product == null) throw new KeyNotFoundException($"The product with ID: {id} was not found in the database.");
+            Product? product = await _db.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
+            if (product is null) throw new KeyNotFoundException($"The product with ID: {id} was not found in the database.");
             return product;
         }
 
@@ -317,10 +325,11 @@ namespace Infrastructure.Services.Products
         /// <param name="name">Name of the product to find in database</param>
         /// <returns>Requested product</returns>
         /// <exception cref="KeyNotFoundException">Thrown if the product wasn't found in the database</exception>
+        /// <param name="ct">Cancellation token for the operation.</param>
         private async Task<Product> getProductByNameAsync(string name, CancellationToken ct)
         {
-            Product product = await _db.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name, ct);
-            if (product == null) throw new KeyNotFoundException($"The product with name: {name} was not found in the database.");
+            Product? product = await _db.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name, ct);
+            if (product is null) throw new KeyNotFoundException($"The product with name: {name} was not found in the database.");
             return product;
         }
 

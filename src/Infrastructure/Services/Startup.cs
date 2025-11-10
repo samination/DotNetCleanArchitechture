@@ -29,18 +29,22 @@ namespace Infrastructure.Services
                 {
                     Service = p.GetInterfaces().FirstOrDefault(),
                     Implementation = p
-                });
+                })
+                .Where(x => x.Service is not null && transientServiceType.IsAssignableFrom(x.Service))
+                .Select(x => new
+                {
+                    Service = x.Service!,
+                    x.Implementation
+                })
+                .ToList();
 
             // Register each transient service for startup
-            if (transientServices.Count() > 0)
+            if (transientServices.Count > 0)
             {
-                Log.Information($"Registering {transientServices.Count()} Transient Service(s)");
+                Log.Information($"Registering {transientServices.Count} Transient Service(s)");
                 foreach (var transientService in transientServices)
                 {
-                    if (transientServiceType.IsAssignableFrom(transientService.Service))
-                    {
-                        services.AddTransient(transientService.Service, transientService.Implementation);
-                    }
+                    services.AddTransient(transientService.Service, transientService.Implementation);
                 }
             }
 
@@ -71,12 +75,18 @@ namespace Infrastructure.Services
                         Implementation = p
                     };
                 })
-                .Where(x => x.Service is not null);
+                .Where(x => x.Service is not null)
+                .Select(x => new
+                {
+                    Service = x.Service!,
+                    x.Implementation
+                })
+                .ToList();
 
             // Register each scoped service for startup
-            if (scopedServices.Count() > 0)
+            if (scopedServices.Count > 0)
             {
-                Log.Information($"Registering {scopedServices.Count()} Scoped Service(s)");
+                Log.Information($"Registering {scopedServices.Count} Scoped Service(s)");
             }
             foreach (var scopedService in scopedServices)
             {
@@ -98,19 +108,23 @@ namespace Infrastructure.Services
                 {
                     Service = p.GetInterfaces().FirstOrDefault(),
                     Implementation = p
-                });
+                })
+                .Where(x => x.Service is not null && singletonServiceType.IsAssignableFrom(x.Service))
+                .Select(x => new
+                {
+                    Service = x.Service!,
+                    x.Implementation
+                })
+                .ToList();
 
             // Register each singleton service for startup
-            if (singletonServices.Count() > 0)
+            if (singletonServices.Count > 0)
             {
-                Log.Information($"Registering {singletonServices.Count()} Singleton Service(s)");
+                Log.Information($"Registering {singletonServices.Count} Singleton Service(s)");
             }
             foreach (var singletonService in singletonServices)
             {
-                if (singletonServiceType.IsAssignableFrom(singletonService.Service))
-                {
-                    services.AddSingleton(singletonService.Service, singletonService.Implementation);
-                }
+                services.AddSingleton(singletonService.Service, singletonService.Implementation);
             }
 
             #endregion Singleton Services

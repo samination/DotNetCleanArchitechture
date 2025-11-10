@@ -11,6 +11,7 @@ namespace Application.Services.Categories
         /// If no category exist in the database with the ID, an exception will be thrown and a status code of 404 will be returned.
         /// </summary>
         /// <param name="id">Category ID</param>
+        /// <param name="ct">Cancellation token for the operation.</param>
         /// <returns>A Single category</returns>
         Task<Category> GetCategoryByIdAsync(Guid id, CancellationToken ct);
 
@@ -19,6 +20,7 @@ namespace Application.Services.Categories
         /// If no category exist in the database with the name provided, an exception will be thrown and a status code of 404 will be returned.
         /// </summary>
         /// <param name="name">Category name</param>
+        /// <param name="ct">Cancellation token for the operation.</param>
         /// <returns>A Single category</returns>
         Task<Category> GetCategoryByNameAsync(string name, CancellationToken ct);
 
@@ -26,6 +28,7 @@ namespace Application.Services.Categories
         /// Get all categories in the database (if any).<br />
         /// If no categories exist in the database, an exception will be thrown and a status code of 404 will be returned.
         /// </summary>
+        /// <param name="ct">Cancellation token for the operation.</param>
         /// <returns>A paginated list of categories</returns>
         Task<PaginatedResult<Category>> GetCategoriesAsync(int pageNumber, int pageSize, CancellationToken ct);
 
@@ -35,6 +38,7 @@ namespace Application.Services.Categories
         /// If a caetgory already exists in the database with the same name, an exception will be thrown and a status code of 400 (Bad Request) will be returned.
         /// </summary>
         /// <param name="category">Category to add in database</param>
+        /// <param name="ct">Cancellation token for the operation.</param>
         /// <returns>The category that has been added in the database</returns>
         Task<Category> CreateCategoryAsync(Category category, CancellationToken ct);
 
@@ -45,6 +49,7 @@ namespace Application.Services.Categories
         /// The updated category name can also not be the same as the one of the current category.
         /// </summary>
         /// <param name="category">Category to update</param>
+        /// <param name="ct">Cancellation token for the operation.</param>
         /// <returns>The updated category in the database</returns>
         Task<Category> UpdateCategoryAsync(Category category, CancellationToken ct);
 
@@ -53,6 +58,7 @@ namespace Application.Services.Categories
         /// If the category doesn't exist a status code of 404 (Not Found) will be returned.
         /// </summary>
         /// <param name="id">Category ID</param>
+        /// <param name="ct">Cancellation token for the operation.</param>
         /// <returns></returns>
         Task DeleteCategoryAsync(Guid id, CancellationToken ct);
     }

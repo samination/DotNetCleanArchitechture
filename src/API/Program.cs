@@ -1,7 +1,7 @@
 using API.Configurations;
 using API.Filters;
 using API.Validation.Auth;
-using Data.Database;
+using Data.Database.Seeds;
 using Infrastructure;
 using Infrastructure.Common;
 using MediatR;

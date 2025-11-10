@@ -1,13 +1,9 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Data.Database.Seeds;
 using Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Data.Database;
+namespace Data.Database.Seeds;
 
 public static class DatabaseSeederExtensions
 {
@@ -21,7 +17,7 @@ public static class DatabaseSeederExtensions
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
         await context.Database.EnsureCreatedAsync(cancellationToken);
-        await SeedDefaultIdentityAsync(userManager, roleManager, cancellationToken);
+        await SeedDefaultIdentityAsync(userManager, roleManager);
 
         if (await context.Categories.AnyAsync(cancellationToken))
         {
@@ -34,8 +30,8 @@ public static class DatabaseSeederExtensions
 
     private static async Task SeedDefaultIdentityAsync(
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole<Guid>> roleManager,
-        CancellationToken cancellationToken)
+        RoleManager<IdentityRole<Guid>> roleManager
+        )
     {
         const string adminRoleName = "Administrator";
         const string adminEmail = "admin@local";
