@@ -8,7 +8,6 @@ namespace Domain.Entitites.Orders
     {
         private Guid _productId;
         private PaymentStatus _paymentStatus = PaymentStatus.Pending;
-        private DateTime _createdAt = DateTime.UtcNow;
         private DateTime? _paidAt;
 
         protected Order()
@@ -19,7 +18,7 @@ namespace Domain.Entitites.Orders
         {
             ProductId = productId;
             _paymentStatus = PaymentStatus.Pending;
-            _createdAt = DateTime.UtcNow;
+            CreatedAt = DateTime.UtcNow;
         }
 
         public Guid ProductId
@@ -32,14 +31,12 @@ namespace Domain.Entitites.Orders
 
         public PaymentStatus PaymentStatus => _paymentStatus;
 
-        public DateTime CreatedAt => _createdAt;
-
         public DateTime? PaidAt => _paidAt;
 
         public void MarkPending()
         {
             _paymentStatus = PaymentStatus.Pending;
-            _createdAt = DateTime.UtcNow;
+            CreatedAt = DateTime.UtcNow;
             _paidAt = null;
             MarkUpdated();
         }
