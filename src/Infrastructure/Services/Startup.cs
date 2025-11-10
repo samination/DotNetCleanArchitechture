@@ -41,7 +41,7 @@ namespace Infrastructure.Services
             // Register each transient service for startup
             if (transientServices.Count > 0)
             {
-                Log.Information($"Registering {transientServices.Count} Transient Service(s)");
+                Log.Information("Registering {ServiceCount} Transient Service(s)", transientServices.Count);
                 foreach (var transientService in transientServices)
                 {
                     services.AddTransient(transientService.Service, transientService.Implementation);
@@ -86,7 +86,7 @@ namespace Infrastructure.Services
             // Register each scoped service for startup
             if (scopedServices.Count > 0)
             {
-                Log.Information($"Registering {scopedServices.Count} Scoped Service(s)");
+                Log.Information("Registering {ServiceCount} Scoped Service(s)", scopedServices.Count);
             }
             foreach (var scopedService in scopedServices)
             {
@@ -120,7 +120,7 @@ namespace Infrastructure.Services
             // Register each singleton service for startup
             if (singletonServices.Count > 0)
             {
-                Log.Information($"Registering {singletonServices.Count} Singleton Service(s)");
+                Log.Information("Registering {ServiceCount} Singleton Service(s)", singletonServices.Count);
             }
             foreach (var singletonService in singletonServices)
             {

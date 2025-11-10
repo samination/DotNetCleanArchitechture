@@ -42,7 +42,7 @@ public class StringNormalizationActionFilter : IActionFilter
 
             if (property.PropertyType == typeof(string))
             {
-                NormalizeStringProperty(instance, property, type);
+                NormalizeStringProperty(instance!, property, type);
                 continue;
             }
 
@@ -54,7 +54,7 @@ public class StringNormalizationActionFilter : IActionFilter
         }
     }
 
-    private bool ShouldSkipNormalization(object? instance, ref HashSet<object>? visited, out Type type)
+    private static bool ShouldSkipNormalization(object? instance, ref HashSet<object>? visited, out Type type)
     {
         type = null!;
 
