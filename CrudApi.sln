@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrudApi.Application.UnitTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrudApi.IntegrationTests", "test\CrudApi.IntegrationTests\CrudApi.IntegrationTests.csproj", "{7E6E86C9-A149-4C2F-B6BC-AF7A78A56F0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetcleanArchMcpServer", "DotnetcleanArchMcpServer\DotnetcleanArchMcpServer.csproj", "{6FAB0F68-77D0-47C0-B521-577124B8F5BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{7E6E86C9-A149-4C2F-B6BC-AF7A78A56F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E6E86C9-A149-4C2F-B6BC-AF7A78A56F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E6E86C9-A149-4C2F-B6BC-AF7A78A56F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FAB0F68-77D0-47C0-B521-577124B8F5BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FAB0F68-77D0-47C0-B521-577124B8F5BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FAB0F68-77D0-47C0-B521-577124B8F5BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FAB0F68-77D0-47C0-B521-577124B8F5BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
