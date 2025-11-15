@@ -4,6 +4,7 @@ using API.Validation.Auth;
 using Data.Database.Seeds;
 using Infrastructure;
 using Infrastructure.Common;
+using Infrastructure.Middleware;
 using MediatR;
 using Serilog;
 using System.Text.Json.Serialization;
@@ -113,6 +114,9 @@ app.UseHttpsRedirection();
 
 // Enable authentication
 app.UseAuthentication();
+
+// Allow MCP internal requests to present shared key instead of JWT
+app.UseMiddleware<McpInternalBypassMiddleware>();
 
 // Enable authorization capabilities
 app.UseAuthorization();
